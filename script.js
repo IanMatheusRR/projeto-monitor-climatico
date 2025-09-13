@@ -98,15 +98,15 @@ function initializeCharts() {
  * Busca os 5 dados mais recentes para os cards e a tabela superior.
  */
 async function updateLatestData() {
-    console.log('[DEBUG] Tentando buscar dados de api_latest.php...');
+    console.log('[DEBUG] Tentando buscar dados de index.php?action=api_latest...');
     try {
-        const response = await fetch('api_latest.php');
+        const response = await fetch('index.php?action=api_latest');
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
         const leituras = await response.json();
         
         // --- PONTO CRÍTICO DE DEBUG ---
-        console.log('[DEBUG] Dados recebidos com SUCESSO de api_latest.php:', leituras);
+        console.log('[DEBUG] Dados recebidos com SUCESSO de index.php?action=api_latest:', leituras);
         
         atualizarCards(leituras);
         atualizarTabela(leituras);
@@ -121,7 +121,7 @@ async function updateLatestData() {
 async function fetchChartData() {
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
-    let apiUrl = 'api_dados.php';
+    let apiUrl = 'index.php?action=api_latest';
     if (startDate && endDate) { apiUrl += `?start=${startDate}&end=${endDate}`; }
     try {
         const response = await fetch(apiUrl);
@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const confirmado = confirm('Você tem certeza que deseja excluir TODAS as medições?\n\nEsta ação não pode ser desfeita.');
             if (confirmado) {
                 try {
-                    const response = await fetch('delete_all.php', { method: 'POST' });
+                    const response = await fetch('index.php?action=api_latest', { method: 'POST' });
                     const result = await response.json();
                     if (response.ok && result.success) {
                         alert('Dados excluídos com sucesso!');

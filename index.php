@@ -1,35 +1,30 @@
 <?php
-// Obtém o caminho da URL que foi requisitada
-$request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+// Obtém a 'ação' a ser executada a partir de um parâmetro na URL
+// Ex: index.php?action=salvar_dados
+$action = $_GET['action'] ?? 'show_dashboard';
 
-// Roteador: Decide qual arquivo carregar com base na URL
-switch ($request_uri) {
-    case '/':
-    case '/index.php':
-        // Se for a página principal, carrega o HTML do dashboard
-        require __DIR__ . '/dashboard.html';
-        break;
-    
-    case '/salvar_dados.php':
+// Roteador: Decide qual arquivo carregar com base na ação
+switch ($action) {
+    case 'salvar_dados':
         require __DIR__ . '/salvar_dados.php';
         break;
         
-    case '/api_dados.php':
+    case 'api_dados':
         require __DIR__ . '/api_dados.php';
         break;
         
-    case '/api_latest.php':
+    case 'api_latest':
         require __DIR__ . '/api_latest.php';
         break;
         
-    case '/delete_all.php':
+    case 'delete_all':
         require __DIR__ . '/delete_all.php';
         break;
-
+    
+    case 'show_dashboard':
     default:
-        // Se a rota não for encontrada, retorna um erro 404
-        http_response_code(404);
-        echo "<h1>404 Not Found</h1>";
-        echo "A pagina '$request_uri' nao foi encontrada.";
+        // Se nenhuma ação for especificada (ou for a ação padrão),
+        // carrega o HTML do dashboard
+        require __DIR__ . '/dashboard.html';
         break;
 }

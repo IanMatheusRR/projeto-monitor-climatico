@@ -29,7 +29,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         try {
             write_log("Tentando conectar ao banco de dados em: " . $db_path);
-            $pdo = new PDO('sqlite:' . $db_path);
+            // Pega a string de conexão da variável de ambiente 'DATABASE_URL'
+            $connection_string = getenv('DATABASE_URL');
+            if ($connection_string === false) {
+                die("Erro: Variavel de ambiente DATABASE_URL nao definida.");
+            }
+            $pdo = new PDO($connection_string);
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             write_log("Conexão com o banco de dados bem-sucedida.");
 
