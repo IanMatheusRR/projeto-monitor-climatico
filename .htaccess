@@ -1,3 +1,2 @@
-<IfModule mod_rewrite.c>
-  RewriteEngine Off
-</IfModule>
+# Simplesmente garante que o diretório principal seja servido.
+DirectoryIndex index.php
