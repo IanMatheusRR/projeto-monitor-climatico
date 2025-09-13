@@ -1,2 +1,1 @@
-# Simplesmente garante que o diretório principal seja servido.
-DirectoryIndex index.php
+# O roteamento agora é feito pelo index.php
