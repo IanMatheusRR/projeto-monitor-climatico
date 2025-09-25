@@ -30,23 +30,25 @@ try {
     // Prepara e executa a instrução SQL para inserir os dados
     $stmt = $pdo->prepare('INSERT INTO leituras (temperatura, umidade) VALUES (:temp, :umid)');
     
+    // --- LINHAS CORRIGIDAS ---
     $stmt->bindValue(':temp', $temperatura);
-    $stmt->bindValue(':umid', '  
-    $stmt->execute();
-    
-    // Se chegou até aqui, tudo deu certo
-    http_response_code(200);
-    echo "Dados salvos com sucesso.";
+    $stmt->bindValue(':umid', $umidade); // Corrigido para usar a variável $umidade
+    
+    $stmt->execute(); // Corrigido, sem a letra 'a'
+    // -----------------------
+    
+    // Se chegou até aqui, tudo deu certo
+    http_response_code(200);
+    echo "Dados salvos com sucesso.";
 
 } catch (PDOException $e) {
-    // Captura qualquer erro relacionado ao banco de dados (ex: driver não encontrado, falha na conexão, erro de SQL)
-    http_response_code(500); // Internal Server Error
-    // A mensagem de erro específica será enviada como resposta, ajudando a depurar
-    echo "!!! ERRO PDO: " . $e->getMessage() . " !!!";
+    // Captura qualquer erro relacionado ao banco de dados
+    http_response_code(500); // Internal Server Error
+    echo "!!! ERRO PDO: " . $e->getMessage() . " !!!";
 
 } catch (Exception $e) {
-    // Captura outros erros, como a variável de ambiente faltando
-    http_response_code(500);
-    echo "!!! ERRO GERAL: " . $e->getMessage() . " !!!";
+    // Captura outros erros
+    http_response_code(500);
+    echo "!!! ERRO GERAL: " . $e->getMessage() . " !!!";
 }
 ?>
