@@ -1,6 +1,6 @@
 // ===================================================================================
 // SCRIPT COMPLETO PARA O DASHBOARD DE MONITORAMENTO
-// Versão: Gráficos Históricos com Filtros (sem atualização em tempo real nos gráficos)
+// Versão: Final para Vercel
 // ===================================================================================
 
 // Variáveis globais para guardar as instâncias dos gráficos
@@ -98,15 +98,12 @@ function initializeCharts() {
  * Busca os 5 dados mais recentes para os cards e a tabela superior.
  */
 async function updateLatestData() {
-    console.log('[DEBUG] Tentando buscar dados de index.php?action=api_latest...');
     try {
-        const response = await fetch('index.php?action=api_latest');
+        // CAMINHO CORRIGIDO PARA VERCEL
+        const response = await fetch('/api/api_latest.php');
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
         const leituras = await response.json();
-        
-        // --- PONTO CRÍTICO DE DEBUG ---
-        console.log('[DEBUG] Dados recebidos com SUCESSO de index.php?action=api_latest:', leituras);
         
         atualizarCards(leituras);
         atualizarTabela(leituras);
@@ -121,8 +118,14 @@ async function updateLatestData() {
 async function fetchChartData() {
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
-    let apiUrl = 'index.php?action=api_latest';
-    if (startDate && endDate) { apiUrl += `?start=${startDate}&end=${endDate}`; }
+    
+    // CAMINHO CORRIGIDO PARA VERCEL
+    let apiUrl = '/api/api_dados.php';
+
+    if (startDate && endDate) {
+        // Para a Vercel, a forma correta de adicionar parâmetros é com '&'
+        apiUrl += `?start=${startDate}&end=${endDate}`;
+    }
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -151,22 +154,19 @@ function updateChartData(chart, labels, data) {
  * @param {Array} leituras - Array de dados, onde o primeiro item é o mais recente.
  */
 function atualizarCards(leituras) {
-    console.log('[DEBUG] Função atualizarCards chamada com os seguintes dados:', leituras);
     const tempElement = document.getElementById('latest-temp');
     const humidityElement = document.getElementById('latest-humidity');
 
     if (!tempElement || !humidityElement) {
-        console.error('[DEBUG] ERRO: Não foi possível encontrar os elementos dos cards no HTML!');
+        console.error('ERRO: Não foi possível encontrar os elementos dos cards no HTML!');
         return;
     }
 
     if (leituras && leituras.length > 0) {
-        console.log('[DEBUG] Há dados. Atualizando cards com valores.');
         const maisRecente = leituras[0];
         tempElement.innerText = `${parseFloat(maisRecente.temperatura).toFixed(1)} °C`;
         humidityElement.innerText = `${parseFloat(maisRecente.umidade).toFixed(1)} %`;
     } else {
-        console.log('[DEBUG] Não há dados. Exibindo estado de "vazio" nos cards.');
         tempElement.innerText = '-- °C';
         humidityElement.innerText = '-- %';
     }
@@ -177,22 +177,19 @@ function atualizarCards(leituras) {
  * @param {Array} leituras - Array com as 5 leituras mais recentes.
  */
 function atualizarTabela(leituras) {
-    console.log('[DEBUG] Função atualizarTabela chamada com os seguintes dados:', leituras);
     const tbody = document.getElementById('dados-tabela');
 
     if (!tbody) {
-        console.error('[DEBUG] ERRO: Não foi possível encontrar o corpo da tabela (tbody) no HTML!');
+        console.error('ERRO: Não foi possível encontrar o corpo da tabela (tbody) no HTML!');
         return;
     }
 
     tbody.innerHTML = '';
     if (!leituras || leituras.length === 0) {
-        console.log('[DEBUG] Não há dados. Exibindo mensagem de "Nenhuma medição encontrada" na tabela.');
         tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhuma medição encontrada.</td></tr>';
         return;
     }
 
-    console.log('[DEBUG] Há dados. Preenchendo a tabela.');
     leituras.forEach(leitura => {
         const tr = document.createElement('tr');
         const dataHora = new Date(leitura.data_hora);
@@ -208,8 +205,6 @@ function atualizarTabela(leituras) {
 // PONTO DE ENTRADA PRINCIPAL - Roda quando a página HTML está pronta
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('[DEBUG] Página carregada. Iniciando script.');
-    
     initializeCharts();
     
     updateLatestData();
@@ -233,7 +228,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const confirmado = confirm('Você tem certeza que deseja excluir TODAS as medições?\n\nEsta ação não pode ser desfeita.');
             if (confirmado) {
                 try {
-                    const response = await fetch('index.php?action=api_latest', { method: 'POST' });
+                    // CAMINHO CORRIGIDO PARA VERCEL
+                    const response = await fetch('/api/delete_all.php', { method: 'POST' });
                     const result = await response.json();
                     if (response.ok && result.success) {
                         alert('Dados excluídos com sucesso!');
